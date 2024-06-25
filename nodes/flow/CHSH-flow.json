@@ -1,16 +1,29 @@
 [
     {
-        "id": "e0e96aefa5eab89e",
+        "id": "8729a9f4aa9668a1",
         "type": "tab",
-        "label": "Flow 1",
+        "label": "CHSH-game Flow",
         "disabled": false,
         "info": "",
         "env": []
     },
     {
-        "id": "inject_init",
+        "id": "b7c64ba741ca9f43",
+        "type": "CHSH-game-classic",
+        "z": "8729a9f4aa9668a1",
+        "name": " Classical strategy",
+        "x": 930,
+        "y": 300,
+        "wires": [
+            [
+                "859f99653d9e69c9"
+            ]
+        ]
+    },
+    {
+        "id": "e8bc4361e2e9636b",
         "type": "inject",
-        "z": "e0e96aefa5eab89e",
+        "z": "8729a9f4aa9668a1",
         "name": "Initialize",
         "props": [],
         "repeat": "",
@@ -18,228 +31,74 @@
         "once": true,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"iterations\": 1000}",
-        "payloadType": "json",
-        "x": 320,
-        "y": 380,
+        "x": 220,
+        "y": 360,
         "wires": [
             [
-                "function_init"
+                "eeea179225477eb8"
             ]
         ]
     },
     {
-        "id": "function_init",
+        "id": "eeea179225477eb8",
         "type": "function",
-        "z": "e0e96aefa5eab89e",
+        "z": "8729a9f4aa9668a1",
         "name": "Initialize Count",
-        "func": "flow.set('winCount', 0);\nflow.set('loseCount', 0);\nflow.set('count', 0);\nmsg.payload = {iterations: 1000};\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 520,
-        "y": 380,
-        "wires": [
-            [
-                "function_loop_control"
-            ]
-        ]
-    },
-    {
-        "id": "function_loop_control",
-        "type": "function",
-        "z": "e0e96aefa5eab89e",
-        "name": "Loop Control",
-        "func": "let count = flow.get('count') || 0;\nlet iterations = msg.payload.iterations;\ncount += 1;\nflow.set('count', count);\n\nif (count <= iterations) {\n    return [msg, null];\n} else {\n    flow.set('count', 0);\n    return [null, {payload: {iterations: iterations}}];\n}",
-        "outputs": 2,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 700,
-        "y": 380,
-        "wires": [
-            [
-                "CHSH_randomise_xy"
-            ],
-            [
-                "function_calculate_percentage"
-            ]
-        ]
-    },
-    {
-        "id": "CHSH_randomise_xy",
-        "type": "CHSH-randomise-xy",
-        "z": "e0e96aefa5eab89e",
-        "name": "Randomise XY",
-        "x": 850,
-        "y": 380,
-        "wires": [
-            [
-                "CHSH_game_classic"
-            ]
-        ]
-    },
-    {
-        "id": "CHSH_game_classic",
-        "type": "CHSH-game-classic",
-        "z": "e0e96aefa5eab89e",
-        "name": "Game Classic",
-        "x": 1020,
-        "y": 380,
-        "wires": [
-            [
-                "function_countWinLose"
-            ]
-        ]
-    },
-    {
-        "id": "function_countWinLose",
-        "type": "function",
-        "z": "e0e96aefa5eab89e",
-        "name": "Count Win/Lose",
-        "func": "var winCount = flow.get('winCount') || 0;\nvar loseCount = flow.get('loseCount') || 0;\n\nif (msg.payload.result.result && typeof msg.payload.result.result === 'string') {\n    if (msg.payload.result.result.toLowerCase()== \"win\") {\n        winCount += 1;\n        flow.set('winCount', winCount);\n    } else if (msg.payload.result.result.toLowerCase()== \"lose\") {\n        loseCount += 1;\n        flow.set('loseCount', loseCount);\n    }\n}\n\nmsg.payload.winCount = winCount;\nmsg.payload.loseCount = loseCount;\n\nreturn msg;",
+        "func": "flow.set('winCount', 0);\nflow.set('loseCount', 0);\nflow.set('count', 0);\nflow.set(\"iterations\",1000);\nmsg.payload={}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
-        "y": 380,
+        "x": 380,
+        "y": 360,
         "wires": [
             [
-                "function_loop_control"
+                "39038c4a94816134"
             ]
         ]
     },
     {
-        "id": "function_calculate_percentage",
+        "id": "39038c4a94816134",
         "type": "function",
-        "z": "e0e96aefa5eab89e",
-        "name": "Calculate Win Percentage",
-        "func": "let winCount = flow.get('winCount') || 0;\nlet iterations = msg.payload.iterations;\n\nlet winPercentage = (winCount / iterations) * 100;\n\nreturn { payload: `Win Percentage: ${winPercentage}%` };",
-        "outputs": 1,
+        "z": "8729a9f4aa9668a1",
+        "name": "Loop Control",
+        "func": "let count = flow.get('count') || 0;\nlet iterations = flow.get('iterations');\ncount += 1;\nflow.set('count', count);\nmsg.count=count;\nif (count <= iterations) {\n    return [msg, null];\n} else {\n    return [null,msg];\n}",
+        "outputs": 2,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1490,
-        "y": 380,
+        "x": 570,
+        "y": 360,
         "wires": [
             [
-                "debug_win_percentage"
-            ]
-        ]
-    },
-    {
-        "id": "debug_win_percentage",
-        "type": "debug",
-        "z": "e0e96aefa5eab89e",
-        "name": "Win Percentage",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1780,
-        "y": 380,
-        "wires": []
-    },
-    {
-        "id": "d03c6c580ef0e963",
-        "type": "inject",
-        "z": "e0e96aefa5eab89e",
-        "name": "Initialize",
-        "props": [],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"iterations\": 1000}",
-        "payloadType": "json",
-        "x": 360,
-        "y": 560,
-        "wires": [
-            [
-                "86c0cd5315dbf2d0"
-            ]
-        ]
-    },
-    {
-        "id": "86c0cd5315dbf2d0",
-        "type": "function",
-        "z": "e0e96aefa5eab89e",
-        "name": "Initialize Count",
-        "func": "flow.set('winCount', 0);\nflow.set('loseCount', 0);\nflow.set('count', 0);\nmsg.payload = {iterations: 1000};\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 580,
-        "y": 560,
-        "wires": [
-            [
-                "ed2b423299fb1ea4"
-            ]
-        ]
-    },
-    {
-        "id": "ed2b423299fb1ea4",
-        "type": "function",
-        "z": "e0e96aefa5eab89e",
-        "name": "Loop Control",
-        "func": "let count = flow.get('count') || 0;\nlet iterations = msg.payload.iterations;\ncount += 1;\nflow.set('count', count);\n\nif (count <= iterations) {\n    return [msg, null];\n} else {\n    flow.set('count', 0);\n    return [null, {payload: {iterations: iterations}}];\n}",
-        "outputs": 2,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 830,
-        "y": 540,
-        "wires": [
-            [
-                "d7e5b4174e733793"
+                "c9f59c43f84cb2d9"
             ],
             [
-                "b0688cb5158819d4"
+                "a89dd7f71b094919"
             ]
         ]
     },
     {
-        "id": "d7e5b4174e733793",
+        "id": "c9f59c43f84cb2d9",
         "type": "CHSH-randomise-xy",
-        "z": "e0e96aefa5eab89e",
+        "z": "8729a9f4aa9668a1",
         "name": "Randomise XY",
-        "x": 900,
-        "y": 640,
+        "x": 740,
+        "y": 360,
         "wires": [
             [
-                "47b42afaa5498431"
+                "b7c64ba741ca9f43"
             ]
         ]
     },
     {
-        "id": "47b42afaa5498431",
-        "type": "CHSH-game-classic",
-        "z": "e0e96aefa5eab89e",
-        "name": "Game Classic",
-        "x": 1120,
-        "y": 640,
-        "wires": [
-            [
-                "8d57d05a498b9670"
-            ]
-        ]
-    },
-    {
-        "id": "8d57d05a498b9670",
+        "id": "d71e096a4c3efddc",
         "type": "function",
-        "z": "e0e96aefa5eab89e",
+        "z": "8729a9f4aa9668a1",
         "name": "Count Win/Lose",
         "func": "var winCount = flow.get('winCount') || 0;\nvar loseCount = flow.get('loseCount') || 0;\n\nif (msg.payload.result.result && typeof msg.payload.result.result === 'string') {\n    if (msg.payload.result.result.toLowerCase()== \"win\") {\n        winCount += 1;\n        flow.set('winCount', winCount);\n    } else if (msg.payload.result.result.toLowerCase()== \"lose\") {\n        loseCount += 1;\n        flow.set('loseCount', loseCount);\n    }\n}\n\nmsg.payload.winCount = winCount;\nmsg.payload.loseCount = loseCount;\n\nreturn msg;",
         "outputs": 1,
@@ -249,37 +108,37 @@
         "finalize": "",
         "libs": [],
         "x": 1360,
-        "y": 640,
+        "y": 360,
         "wires": [
             [
-                "ed2b423299fb1ea4"
+                "39038c4a94816134"
             ]
         ]
     },
     {
-        "id": "b0688cb5158819d4",
+        "id": "a89dd7f71b094919",
         "type": "function",
-        "z": "e0e96aefa5eab89e",
+        "z": "8729a9f4aa9668a1",
         "name": "Calculate Win Percentage",
-        "func": "let winCount = flow.get('winCount') || 0;\nlet iterations = msg.payload.iterations;\n\nlet winPercentage = (winCount / iterations) * 100;\n\nreturn { payload: `Win Percentage: ${winPercentage}%` };",
+        "func": "let winCount = flow.get('winCount') || 0;\nlet iterations = flow.get('iterations') || 0;\n\nlet winPercentage = (winCount / iterations) * 100;\n\nreturn { payload: `Win Percentage: ${winPercentage}%` };",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1470,
-        "y": 560,
+        "x": 1570,
+        "y": 360,
         "wires": [
             [
-                "74511ee689f5c33f"
+                "37eb7cbd746d6bc5"
             ]
         ]
     },
     {
-        "id": "74511ee689f5c33f",
+        "id": "37eb7cbd746d6bc5",
         "type": "debug",
-        "z": "e0e96aefa5eab89e",
+        "z": "8729a9f4aa9668a1",
         "name": "Win Percentage",
         "active": true,
         "tosidebar": true,
@@ -289,8 +148,193 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1740,
-        "y": 560,
+        "x": 1800,
+        "y": 360,
         "wires": []
+    },
+    {
+        "id": "859f99653d9e69c9",
+        "type": "function",
+        "z": "8729a9f4aa9668a1",
+        "name": "[DEBUG] Counter",
+        "func": "let win = flow.get('winCount');\nlet lose = flow.get('loseCount');\nlet count = flow.get('count');\nlet percent = win / (win + lose);\nlet output = {\n    \"winCount\": win,\n    \"lostCount\": lose,\n    \"winPercentage\": percent,\n    \"iteration\": count\n};\n\n// Convert the output object to a JSON string\nlet outputString = JSON.stringify(output);\n\n// Log the JSON string\nconsole.log(\"[DEBUG]\" + outputString);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 360,
+        "wires": [
+            [
+                "d71e096a4c3efddc"
+            ]
+        ]
+    },
+    {
+        "id": "8d103f13db5e6ef1",
+        "type": "inject",
+        "z": "8729a9f4aa9668a1",
+        "name": "Initialize",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 220,
+        "y": 500,
+        "wires": [
+            [
+                "5b3d86f8bbebda47"
+            ]
+        ]
+    },
+    {
+        "id": "5b3d86f8bbebda47",
+        "type": "function",
+        "z": "8729a9f4aa9668a1",
+        "name": "Initialize Count",
+        "func": "flow.set('winCount', 0);\nflow.set('loseCount', 0);\nflow.set('count', 0);\nflow.set(\"iterations\",1000);\nmsg.payload={}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 500,
+        "wires": [
+            [
+                "8c551631bc86d657"
+            ]
+        ]
+    },
+    {
+        "id": "8c551631bc86d657",
+        "type": "function",
+        "z": "8729a9f4aa9668a1",
+        "name": "Loop Control",
+        "func": "let count = flow.get('count') || 0;\nlet iterations = flow.get('iterations');\ncount += 1;\nflow.set('count', count);\nmsg.count=count;\nif (count <= iterations) {\n    return [msg, null];\n} else {\n    return [null,msg];\n}",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 500,
+        "wires": [
+            [
+                "9be69a5d367d5b2f"
+            ],
+            [
+                "ef6af989129ec3b4"
+            ]
+        ]
+    },
+    {
+        "id": "9be69a5d367d5b2f",
+        "type": "CHSH-randomise-xy",
+        "z": "8729a9f4aa9668a1",
+        "name": "Randomise XY",
+        "x": 740,
+        "y": 500,
+        "wires": [
+            [
+                "10b01471530408c8"
+            ]
+        ]
+    },
+    {
+        "id": "e9d6c7d7a36d7e12",
+        "type": "function",
+        "z": "8729a9f4aa9668a1",
+        "name": "Count Win/Lose",
+        "func": "var winCount = flow.get('winCount') || 0;\nvar loseCount = flow.get('loseCount') || 0;\n\nif (msg.payload.result.result && typeof msg.payload.result.result === 'string') {\n    if (msg.payload.result.result.toLowerCase()== \"win\") {\n        winCount += 1;\n        flow.set('winCount', winCount);\n    } else if (msg.payload.result.result.toLowerCase()== \"lose\") {\n        loseCount += 1;\n        flow.set('loseCount', loseCount);\n    }\n}\n\nmsg.payload.winCount = winCount;\nmsg.payload.loseCount = loseCount;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1360,
+        "y": 500,
+        "wires": [
+            [
+                "8c551631bc86d657"
+            ]
+        ]
+    },
+    {
+        "id": "ef6af989129ec3b4",
+        "type": "function",
+        "z": "8729a9f4aa9668a1",
+        "name": "Calculate Win Percentage",
+        "func": "let winCount = flow.get('winCount') || 0;\nlet iterations = flow.get('iterations') || 0;\n\nlet winPercentage = (winCount / iterations) * 100;\n\nreturn { payload: `Win Percentage: ${winPercentage}%` };",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1570,
+        "y": 500,
+        "wires": [
+            [
+                "97e84c4e9585c344"
+            ]
+        ]
+    },
+    {
+        "id": "97e84c4e9585c344",
+        "type": "debug",
+        "z": "8729a9f4aa9668a1",
+        "name": "Win Percentage",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1800,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "8907771b6f9e048a",
+        "type": "function",
+        "z": "8729a9f4aa9668a1",
+        "name": "[DEBUG] Counter",
+        "func": "let win = flow.get('winCount');\nlet lose = flow.get('loseCount');\nlet count = flow.get('count');\nlet percent = win / (win + lose);\nlet output = {\n    \"winCount\": win,\n    \"lostCount\": lose,\n    \"winPercentage\": percent,\n    \"iteration\": count\n};\n\n// Convert the output object to a JSON string\nlet outputString = JSON.stringify(output);\n\n// Log the JSON string\nconsole.log(\"[DEBUG]\" + outputString);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 500,
+        "wires": [
+            [
+                "e9d6c7d7a36d7e12"
+            ]
+        ]
+    },
+    {
+        "id": "10b01471530408c8",
+        "type": "CHSH-game-quantum",
+        "z": "8729a9f4aa9668a1",
+        "name": "Quantum Stratergy",
+        "x": 930,
+        "y": 440,
+        "wires": [
+            [
+                "8907771b6f9e048a"
+            ]
+        ]
     }
 ]
